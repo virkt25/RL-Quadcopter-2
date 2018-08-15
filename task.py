@@ -1,5 +1,6 @@
 import numpy as np
 from physics_sim import PhysicsSim
+import math
 
 class TakeoffTask():
     def __init__(self, init_pose=None, init_velocities=None, init_angle_velocities=None, runtime=5., target_pos=None):
@@ -16,12 +17,7 @@ class TakeoffTask():
         
     def get_reward(self):
         distance = abs(np.linalg.norm(self.sim.pose[:3] - self.target_pos))
-        reward = 10. - (0.1 * distance) + min(self.sim.pose[2], 100) + np.tanh(self.sim.v[2])
-#         angle = abs(np.linalg.norm(self.sim.pose[3:6]))
-#         reward += -0.01*angle
-#         heightBonus = abs(self.sim.pose[2] - self.target_pos[2]) // 10
-#         reward += min(heightBonus, 10)
-#         reward = 2. - (self.sim.pose[0]**2 + self.sim.pose[1]**2)**0.5 + abs(self.sim.pose[2])
+        reward = 10. - (0.1 * distance) + math.log(max(min(self.sim.pose[2], 100), 1), 2) + np.tanh(self.sim.v[2])
         return reward
     
     def step(self, rotor_speeds):
